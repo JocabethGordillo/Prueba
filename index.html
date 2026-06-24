@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Talento Humano — Registro de Movimientos</title>
+<title>Chesa — Talento Humano</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
   :root {
@@ -128,7 +128,26 @@
   .modal-row { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; }
   .modal-row .lbl { color: var(--text-secondary); min-width: 130px; font-size: 12px; }
   .modal-row .val { font-weight: 500; word-break: break-word; }
-  @media print { body { background: white; } .tabs, .actions, .search-bar, .filter-row, .row-actions, .btn, .toast { display: none !important; } .section { display: block !important; } .card { border: 1px solid #ccc; margin-bottom: 1rem; } }
+  /* ── Reporte ── */
+  .rep-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; margin-bottom: 1.25rem; }
+  @media (max-width: 900px) { .rep-grid { grid-template-columns: repeat(3,1fr); } }
+  @media (max-width: 560px) { .rep-grid { grid-template-columns: repeat(2,1fr); } }
+  .kpi { background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 1rem; }
+  .kpi-val { font-size: 32px; font-weight: 500; line-height: 1; }
+  .kpi-lbl { font-size: 11px; color: var(--text-secondary); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi-delta { font-size: 12px; margin-top: 6px; font-weight: 500; }
+  .kpi-delta.pos { color: #1D9E75; }
+  .kpi-delta.neg { color: #D85A30; }
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  @media (max-width: 700px) { .charts-row { grid-template-columns: 1fr; } }
+  .rep-filter { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .rep-filter select, .rep-filter input { font-size: 13px; padding: 7px 10px; border-radius: var(--radius-md); border: 0.5px solid var(--border-md); background: var(--bg-primary); color: var(--text-primary); font-family: inherit; outline: none; }
+  .rep-filter label { font-size: 12px; color: var(--text-secondary); }
+  .rep-tabs { display: flex; gap: 4px; margin-bottom: 1rem; }
+  .rep-tab { padding: 6px 14px; font-size: 12px; font-weight: 500; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--bg-secondary); color: var(--text-secondary); cursor: pointer; font-family: inherit; }
+  .rep-tab.active { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); }
+  .trend-pill { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+  @media print { body { background: white; } .tabs, .actions, .search-bar, .filter-row, .row-actions, .btn, .toast, .rep-filter { display: none !important; } .section { display: block !important; } .card { border: 1px solid #ccc; margin-bottom: 1rem; } }
 </style>
 </head>
 <body>
@@ -136,9 +155,10 @@
 <div class="app">
 
   <div class="header">
-    <div class="header-icon">
-      <i class="ti ti-users" style="font-size:22px;color:#378ADD" aria-hidden="true"></i>
+    <div style="flex-shrink:0">
+      <img src="Chesa_Logo.png" alt="Chesa" style="height:44px;width:auto;display:block;">
     </div>
+    <div style="width:0.5px;height:36px;background:var(--border);flex-shrink:0"></div>
     <div>
       <h1>Talento humano</h1>
       <p>Registro de movimientos y documentación de personal</p>
@@ -156,6 +176,7 @@
     <button class="tab" onclick="showTab('baja',this)"><i class="ti ti-user-minus" aria-hidden="true"></i> Baja de personal</button>
     <button class="tab" onclick="showTab('seguimiento',this)"><i class="ti ti-file-search" aria-hidden="true"></i> Seguimiento documental</button>
     <button class="tab" onclick="showTab('historial',this)"><i class="ti ti-history" aria-hidden="true"></i> Historial</button>
+    <button class="tab" onclick="showTab('reporte',this)"><i class="ti ti-chart-bar" aria-hidden="true"></i> Reporte</button>
   </div>
 
   <!-- DASHBOARD -->
@@ -309,6 +330,67 @@
     </div>
     <div class="card" style="padding:0;overflow:hidden">
       <div id="historial-table" class="table-wrap"></div>
+    </div>
+  </div>
+
+  <!-- REPORTE -->
+  <div id="sec-reporte" class="section">
+    <div class="rep-filter">
+      <label>Año:</label>
+      <select id="r-anio" onchange="renderReporte()"></select>
+      <label>Mes:</label>
+      <select id="r-mes" onchange="renderReporte()">
+        <option value="">Todos</option>
+        <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option>
+        <option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option>
+        <option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option>
+        <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+      <label>Departamento:</label>
+      <select id="r-depto" onchange="renderReporte()">
+        <option value="">Todos</option>
+        <option>Administración</option><option>Operaciones</option><option>Ventas</option>
+        <option>Recursos humanos</option><option>Contabilidad</option><option>Sistemas</option>
+        <option>Logística</option><option>Producción</option><option>Dirección</option><option>Otro</option>
+      </select>
+      <button class="btn" onclick="exportReporteCSV()" style="margin-left:auto"><i class="ti ti-download" aria-hidden="true"></i> Exportar reporte</button>
+      <button class="btn" onclick="window.print()"><i class="ti ti-printer" aria-hidden="true"></i> Imprimir</button>
+    </div>
+
+    <div class="rep-grid" id="rep-kpis"></div>
+
+    <div class="charts-row">
+      <div class="card" style="padding:1.25rem">
+        <div class="sec-title">Altas vs bajas por mes</div>
+        <div style="position:relative;height:220px"><canvas id="chart-altasbajasmes" role="img" aria-label="Gráfica de altas y bajas por mes">Altas y bajas mensuales.</canvas></div>
+        <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--text-secondary)">
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#1D9E75;display:inline-block"></span>Altas</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#D85A30;display:inline-block"></span>Bajas</span>
+        </div>
+      </div>
+      <div class="card" style="padding:1.25rem">
+        <div class="sec-title">Motivos de baja</div>
+        <div style="position:relative;height:220px"><canvas id="chart-motivos" role="img" aria-label="Gráfica de motivos de baja">Motivos de baja.</canvas></div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="card" style="padding:1.25rem">
+        <div class="sec-title">Movimientos por departamento</div>
+        <div style="position:relative;height:220px"><canvas id="chart-deptos" role="img" aria-label="Gráfica de movimientos por departamento">Movimientos por departamento.</canvas></div>
+      </div>
+      <div class="card" style="padding:1.25rem">
+        <div class="sec-title">Tipos de contrato (ingresos)</div>
+        <div style="position:relative;height:220px"><canvas id="chart-contratos" role="img" aria-label="Gráfica de tipos de contrato">Tipos de contrato.</canvas></div>
+      </div>
+    </div>
+
+    <div class="rep-tabs">
+      <button class="rep-tab active" onclick="showRepTab('altas',this)"><i class="ti ti-user-plus" style="font-size:12px;vertical-align:-1px" aria-hidden="true"></i> Detalle altas</button>
+      <button class="rep-tab" onclick="showRepTab('bajas',this)"><i class="ti ti-user-minus" style="font-size:12px;vertical-align:-1px" aria-hidden="true"></i> Detalle bajas</button>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div id="rep-tabla" class="table-wrap"></div>
     </div>
   </div>
 
@@ -486,6 +568,215 @@ function exportCSV() {
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect();});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ── Reporte ───────────────────────────────────
+let repTabActivo = 'altas';
+let chartAB=null, chartMot=null, chartDep=null, chartCon=null;
+
+function initRepAnio() {
+  const sel = document.getElementById('r-anio');
+  const anioActual = new Date().getFullYear();
+  const anios = new Set(records.map(r => r.fecha.slice(0,4)));
+  anios.add(String(anioActual));
+  sel.innerHTML = [...anios].sort().reverse().map(a =>
+    `<option value="${a}"${a===String(anioActual)?' selected':''}>${a}</option>`).join('');
+}
+
+function repFilter(tipo) {
+  const anio = document.getElementById('r-anio')?.value || '';
+  const mes  = document.getElementById('r-mes')?.value  || '';
+  const dep  = document.getElementById('r-depto')?.value|| '';
+  return records.filter(r => {
+    if (tipo && r.tipo !== tipo) return false;
+    if (anio && !r.fecha.startsWith(anio)) return false;
+    if (mes  && r.fecha.slice(5,7) !== mes) return false;
+    if (dep  && r.departamento !== dep) return false;
+    return true;
+  });
+}
+
+function showRepTab(tab, el) {
+  repTabActivo = tab;
+  document.querySelectorAll('.rep-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderRepTabla();
+}
+
+function renderRepTabla() {
+  const data = repFilter(repTabActivo === 'altas' ? 'ingreso' : 'baja');
+  const box = document.getElementById('rep-tabla');
+  if (!data.length) {
+    box.innerHTML = '<div class="empty"><i class="ti ti-inbox" aria-hidden="true"></i>Sin registros en el período seleccionado.</div>';
+    return;
+  }
+  if (repTabActivo === 'altas') {
+    box.innerHTML = `<table><thead><tr><th>Fecha</th><th>Nombre</th><th>RFC</th><th>Puesto</th><th>Departamento</th><th>Contrato</th><th>Salario</th><th>Docs recibidos</th></tr></thead><tbody>${
+      data.map(r=>`<tr>
+        <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap">${r.fecha}</td>
+        <td style="font-weight:500">${r.nombre}</td>
+        <td style="font-family:monospace;font-size:12px">${r.rfc||'—'}</td>
+        <td>${r.puesto||'—'}</td>
+        <td style="font-size:12px;color:var(--text-secondary)">${r.departamento||'—'}</td>
+        <td style="font-size:12px">${r.contrato||'—'}</td>
+        <td style="font-size:12px">${r.salario?fmtMoney(r.salario):'—'}</td>
+        <td style="font-size:12px;color:var(--text-secondary)">${r.documentos?.length||0} / ${DOCS_INGRESO.length}</td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  } else {
+    box.innerHTML = `<table><thead><tr><th>Fecha baja</th><th>Nombre</th><th>RFC</th><th>Puesto</th><th>Departamento</th><th>Motivo</th><th>Días liq.</th><th>Importe liq.</th></tr></thead><tbody>${
+      data.map(r=>`<tr>
+        <td style="font-size:12px;color:var(--text-secondary);white-space:nowrap">${r.fecha}</td>
+        <td style="font-weight:500">${r.nombre}</td>
+        <td style="font-family:monospace;font-size:12px">${r.rfc||'—'}</td>
+        <td>${r.puesto||'—'}</td>
+        <td style="font-size:12px;color:var(--text-secondary)">${r.departamento||'—'}</td>
+        <td><span class="badge badge-baja">${r.motivo||'—'}</span></td>
+        <td style="font-size:12px">${r.diasLiq||'—'}</td>
+        <td style="font-size:12px">${r.importeLiq?fmtMoney(r.importeLiq):'—'}</td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+}
+
+function mkChart(id, config, ref) {
+  if (ref) ref.destroy();
+  const ctx = document.getElementById(id);
+  if (!ctx) return null;
+  return new Chart(ctx, config);
+}
+
+const MESES_CORTOS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+function renderReporte() {
+  // actualizar selector de años si hay nuevos datos
+  initRepAnio();
+
+  const anio = document.getElementById('r-anio')?.value || String(new Date().getFullYear());
+  const mes  = document.getElementById('r-mes')?.value  || '';
+
+  const altas = repFilter('ingreso');
+  const bajas = repFilter('baja');
+
+  // ── KPIs ──
+  const totalAltas = altas.length;
+  const totalBajas = bajas.length;
+  const rotacion = totalAltas+totalBajas > 0 ? Math.round(totalBajas/(totalAltas||1)*100) : 0;
+  const promedioSal = altas.filter(r=>r.salario).length ?
+    Math.round(altas.filter(r=>r.salario).reduce((s,r)=>s+Number(r.salario),0) / altas.filter(r=>r.salario).length) : 0;
+  const totalLiq = bajas.reduce((s,r)=>s+Number(r.importeLiq||0),0);
+
+  document.getElementById('rep-kpis').innerHTML = `
+    <div class="kpi">
+      <div style="font-size:18px;color:#1D9E75;margin-bottom:6px"><i class="ti ti-user-plus" aria-hidden="true"></i></div>
+      <div class="kpi-val" style="color:#1D9E75">${totalAltas}</div>
+      <div class="kpi-lbl">Altas</div>
+    </div>
+    <div class="kpi">
+      <div style="font-size:18px;color:#D85A30;margin-bottom:6px"><i class="ti ti-user-minus" aria-hidden="true"></i></div>
+      <div class="kpi-val" style="color:#D85A30">${totalBajas}</div>
+      <div class="kpi-lbl">Bajas</div>
+    </div>
+    <div class="kpi">
+      <div style="font-size:18px;color:#378ADD;margin-bottom:6px"><i class="ti ti-replace" aria-hidden="true"></i></div>
+      <div class="kpi-val" style="color:#378ADD">${totalAltas-totalBajas >= 0 ? '+':''}${totalAltas-totalBajas}</div>
+      <div class="kpi-lbl">Variación neta</div>
+    </div>
+    <div class="kpi">
+      <div style="font-size:18px;color:#BA7517;margin-bottom:6px"><i class="ti ti-rotate-clockwise" aria-hidden="true"></i></div>
+      <div class="kpi-val" style="color:#BA7517">${rotacion}%</div>
+      <div class="kpi-lbl">Índice rotación</div>
+    </div>
+    <div class="kpi">
+      <div style="font-size:18px;color:#534AB7;margin-bottom:6px"><i class="ti ti-cash" aria-hidden="true"></i></div>
+      <div class="kpi-val" style="color:#534AB7;font-size:20px">${totalLiq>0?fmtMoney(totalLiq):'—'}</div>
+      <div class="kpi-lbl">Total liquidaciones</div>
+    </div>`;
+
+  // ── Gráfica altas vs bajas por mes ──
+  const mesesLabels = mes ? [MESES_CORTOS[parseInt(mes)-1]] : MESES_CORTOS;
+  const mesesKeys   = mes ? [mes] : ['01','02','03','04','05','06','07','08','09','10','11','12'];
+
+  const dataAltas = mesesKeys.map(m => records.filter(r=>r.tipo==='ingreso'&&r.fecha.startsWith(anio)&&r.fecha.slice(5,7)===m).length);
+  const dataBajas = mesesKeys.map(m => records.filter(r=>r.tipo==='baja'   &&r.fecha.startsWith(anio)&&r.fecha.slice(5,7)===m).length);
+
+  chartAB = mkChart('chart-altasbajasmes', {
+    type: 'bar',
+    data: { labels: mesesLabels, datasets: [
+      { label:'Altas', data:dataAltas, backgroundColor:'#1D9E75', borderRadius:4 },
+      { label:'Bajas', data:dataBajas, backgroundColor:'#D85A30', borderRadius:4 }
+    ]},
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
+      scales:{ x:{ grid:{display:false} }, y:{ beginAtZero:true, ticks:{stepSize:1} } } }
+  }, chartAB);
+
+  // ── Gráfica motivos de baja ──
+  const motivoMap = {};
+  bajas.forEach(r=>{ const k=r.motivo||'Sin especificar'; motivoMap[k]=(motivoMap[k]||0)+1; });
+  const motivoColors = ['#D85A30','#E4815C','#EFA488','#F5C7B3','#BA3510','#8B2408','#631808','#3D0E04'];
+  chartMot = mkChart('chart-motivos', {
+    type: 'doughnut',
+    data: { labels: Object.keys(motivoMap), datasets:[{ data:Object.values(motivoMap), backgroundColor:motivoColors.slice(0,Object.keys(motivoMap).length), borderWidth:0 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{ font:{size:11}, boxWidth:12, padding:10 } } } }
+  }, chartMot);
+
+  // ── Gráfica departamentos ──
+  const depMap = {};
+  [...altas,...bajas].forEach(r=>{ const k=r.departamento||'Sin depto'; depMap[k]=(depMap[k]||0)+1; });
+  const depKeys = Object.keys(depMap).sort((a,b)=>depMap[b]-depMap[a]);
+  chartDep = mkChart('chart-deptos', {
+    type: 'bar',
+    data: { labels: depKeys, datasets:[{ label:'Movimientos', data:depKeys.map(k=>depMap[k]), backgroundColor:'#378ADD', borderRadius:4 }] },
+    options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
+      scales:{ x:{ beginAtZero:true, ticks:{stepSize:1} }, y:{ grid:{display:false} } } }
+  }, chartDep);
+
+  // ── Gráfica contratos ──
+  const conMap = {};
+  altas.forEach(r=>{ const k=r.contrato||'Sin especificar'; conMap[k]=(conMap[k]||0)+1; });
+  const conColors = ['#534AB7','#7F77DD','#AFA9EC','#CECBF6','#3C3489','#26215C'];
+  chartCon = mkChart('chart-contratos', {
+    type: 'pie',
+    data: { labels:Object.keys(conMap), datasets:[{ data:Object.values(conMap), backgroundColor:conColors.slice(0,Object.keys(conMap).length), borderWidth:0 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{ font:{size:11}, boxWidth:12, padding:10 } } } }
+  }, chartCon);
+
+  renderRepTabla();
+}
+
+function exportReporteCSV() {
+  const altas = repFilter('ingreso');
+  const bajas = repFilter('baja');
+  if (!altas.length && !bajas.length) { toast('Sin datos en el período seleccionado'); return; }
+  const anio = document.getElementById('r-anio')?.value||'';
+  const mes  = document.getElementById('r-mes')?.value||'';
+  const periodoLabel = `${anio}${mes?'-'+mes:''}`;
+  const hAltas = ['Tipo','Fecha','Nombre','RFC','CURP','NSS','Puesto','Departamento','Contrato','Salario','Correo','Jefe','Docs recibidos'];
+  const hBajas = ['Tipo','Fecha baja','Nombre','RFC','Puesto','Departamento','Motivo','Último día','Días liq.','Importe liq.','Docs entregados'];
+  const rowsA  = altas.map(r=>['Ingreso',r.fecha,r.nombre,r.rfc||'',r.curp||'',r.nss||'',r.puesto||'',r.departamento||'',r.contrato||'',r.salario||'',r.correo||'',r.jefe||'',(r.documentos||[]).join(' | ')].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
+  const rowsB  = bajas.map(r=>['Baja',r.fecha,r.nombre,r.rfc||'',r.puesto||'',r.departamento||'',r.motivo||'',r.ultimoDia||'',r.diasLiq||'',r.importeLiq||'',(r.documentos||[]).join(' | ')].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
+  const csv = '﻿' + [
+    `"REPORTE TALENTO HUMANO — CHESA — Período: ${periodoLabel}"`,
+    '', '"ALTAS"', hAltas.join(','), ...rowsA,
+    '', '"BAJAS"', hBajas.join(','), ...rowsB
+  ].join('\r\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `reporte_th_${periodoLabel||'completo'}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  toast('✓ Reporte exportado');
+}
+
+// Inicializar año al cargar
+initRepAnio();
+
+// Actualizar año en showTab reporte
+const _origShowTab = showTab;
+function showTab(name, el) {
+  _origShowTab(name, el);
+  if (name === 'reporte') { initRepAnio(); renderReporte(); }
+}
 </script>
 </body>
 </html>
