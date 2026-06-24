@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talento Humano — Registro de Movimientos</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f4;
+    --bg-tertiary: #efefed;
+    --text-primary: #1a1a18;
+    --text-secondary: #6b6b67;
+    --text-tertiary: #a0a09c;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --success-bg: #EAF3DE; --success-text: #3B6D11;
+    --danger-bg: #FCEBEB;  --danger-text: #A32D2D;
+    --info-bg: #E6F1FB;    --info-text: #185FA5;
+    --warning-bg: #FAEEDA; --warning-text: #854F0B;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1c;
+      --bg-secondary: #282825;
+      --bg-tertiary: #323230;
+      --text-primary: #f0f0ec;
+      --text-secondary: #a0a09c;
+      --text-tertiary: #6b6b67;
+      --border: rgba(255,255,255,0.10);
+      --border-md: rgba(255,255,255,0.20);
+      --success-bg: #173404; --success-text: #C0DD97;
+      --danger-bg: #501313;  --danger-text: #F7C1C1;
+      --info-bg: #042C53;    --info-text: #B5D4F4;
+      --warning-bg: #412402; --warning-text: #FAC775;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 14px;
+    min-height: 100vh;
+  }
+  .app { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+  .header-icon { width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--bg-primary); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header h1 { font-size: 20px; font-weight: 500; }
+  .header p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+  .tabs { display: flex; gap: 2px; background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 4px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .tab { padding: 8px 14px; cursor: pointer; font-size: 13px; color: var(--text-secondary); border-radius: var(--radius-md); background: none; border: none; display: flex; align-items: center; gap: 6px; font-family: inherit; transition: background 0.15s, color 0.15s; }
+  .tab:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .tab.active { background: var(--bg-secondary); color: var(--text-primary); font-weight: 500; }
+  .card { background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .sec-title { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 700px) { .grid3, .grid4 { grid-template-columns: 1fr 1fr; } .grid2 { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .grid3, .grid4, .grid2 { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  .field input, .field select, .field textarea {
+    font-size: 13px; padding: 8px 10px; border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-md); background: var(--bg-secondary);
+    color: var(--text-primary); width: 100%; font-family: inherit;
+    transition: border-color 0.15s; outline: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: #378ADD; box-shadow: 0 0 0 3px rgba(55,138,221,0.15);
+  }
+  .field textarea { resize: vertical; min-height: 76px; }
+  .btn { padding: 8px 16px; border-radius: var(--radius-md); border: 0.5px solid var(--border-md); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; transition: background 0.15s; }
+  .btn:hover { background: var(--bg-tertiary); }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); }
+  .btn-primary:hover { opacity: 0.85; background: var(--text-primary); }
+  .btn-danger { border-color: #F09595; color: var(--danger-text); }
+  .btn-danger:hover { background: var(--danger-bg); }
+  .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; flex-wrap: wrap; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; border-radius: var(--radius-md); font-weight: 500; white-space: nowrap; }
+  .badge-ingreso { background: var(--success-bg); color: var(--success-text); }
+  .badge-baja { background: var(--danger-bg); color: var(--danger-text); }
+  .badge-seguimiento { background: var(--info-bg); color: var(--info-text); }
+  .badge-pendiente { background: var(--warning-bg); color: var(--warning-text); }
+  .badge-completado { background: var(--success-bg); color: var(--success-text); }
+  .badge-enproceso { background: var(--info-bg); color: var(--info-text); }
+  .badge-vencido { background: var(--danger-bg); color: var(--danger-text); }
+  .metric { background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 1rem 1.25rem; }
+  .metric-icon { font-size: 20px; margin-bottom: 8px; }
+  .metric-val { font-size: 28px; font-weight: 500; line-height: 1.1; }
+  .metric-lbl { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
+  th { text-align: left; padding: 9px 12px; font-size: 11px; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.04em; border-bottom: 0.5px solid var(--border); background: var(--bg-secondary); white-space: nowrap; }
+  td { padding: 11px 12px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg-secondary); }
+  .search-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .search-bar input { flex: 1; font-size: 13px; padding: 8px 10px; border-radius: var(--radius-md); border: 0.5px solid var(--border-md); background: var(--bg-primary); color: var(--text-primary); font-family: inherit; outline: none; }
+  .search-bar input:focus { border-color: #378ADD; box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+  .filter-row select { font-size: 12px; padding: 6px 9px; border-radius: var(--radius-md); border: 0.5px solid var(--border-md); background: var(--bg-primary); color: var(--text-primary); font-family: inherit; outline: none; cursor: pointer; }
+  .doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 6px; margin-bottom: 14px; }
+  .doc-check { display: flex; align-items: center; gap: 7px; font-size: 12px; cursor: pointer; padding: 7px 9px; border: 0.5px solid var(--border); border-radius: var(--radius-md); background: var(--bg-secondary); transition: border-color 0.15s; user-select: none; }
+  .doc-check:hover { border-color: var(--border-md); background: var(--bg-tertiary); }
+  .doc-check input[type="checkbox"] { accent-color: #378ADD; width: 14px; height: 14px; flex-shrink: 0; cursor: pointer; }
+  .empty { text-align: center; padding: 3rem 1rem; color: var(--text-tertiary); font-size: 13px; }
+  .empty i { font-size: 32px; display: block; margin-bottom: 10px; }
+  .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 5px; border-radius: var(--radius-md); display: inline-flex; align-items: center; transition: background 0.15s, color 0.15s; }
+  .icon-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .row-actions { display: flex; gap: 2px; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text-primary); color: var(--bg-primary); padding: 10px 18px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; opacity: 0; transform: translateY(8px); transition: opacity 0.25s, transform 0.25s; pointer-events: none; z-index: 9999; max-width: 320px; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .divider { border: none; border-top: 0.5px solid var(--border); margin: 1rem 0; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg-primary); border-radius: var(--radius-lg); border: 0.5px solid var(--border); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--border); }
+  .modal-header h3 { font-size: 15px; font-weight: 500; }
+  .modal-body { padding: 1.25rem; }
+  .modal-row { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+  .modal-row .lbl { color: var(--text-secondary); min-width: 130px; font-size: 12px; }
+  .modal-row .val { font-weight: 500; word-break: break-word; }
+  @media print { body { background: white; } .tabs, .actions, .search-bar, .filter-row, .row-actions, .btn, .toast { display: none !important; } .section { display: block !important; } .card { border: 1px solid #ccc; margin-bottom: 1rem; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <div class="header-icon">
+      <i class="ti ti-users" style="font-size:22px;color:#378ADD" aria-hidden="true"></i>
+    </div>
+    <div>
+      <h1>Talento humano</h1>
+      <p>Registro de movimientos y documentación de personal</p>
+    </div>
+    <div style="margin-left:auto">
+      <button class="btn" onclick="window.print()">
+        <i class="ti ti-printer" aria-hidden="true"></i> Imprimir
+      </button>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" onclick="showTab('dashboard',this)"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Resumen</button>
+    <button class="tab" onclick="showTab('ingreso',this)"><i class="ti ti-user-plus" aria-hidden="true"></i> Nuevo ingreso</button>
+    <button class="tab" onclick="showTab('baja',this)"><i class="ti ti-user-minus" aria-hidden="true"></i> Baja de personal</button>
+    <button class="tab" onclick="showTab('seguimiento',this)"><i class="ti ti-file-search" aria-hidden="true"></i> Seguimiento documental</button>
+    <button class="tab" onclick="showTab('historial',this)"><i class="ti ti-history" aria-hidden="true"></i> Historial</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="sec-dashboard" class="section active">
+    <div class="grid4" id="metrics-box" style="margin-bottom:1.25rem"></div>
+    <div class="card">
+      <div class="sec-title">Movimientos recientes</div>
+      <div id="recent-table" class="table-wrap"></div>
+    </div>
+  </div>
+
+  <!-- INGRESO -->
+  <div id="sec-ingreso" class="section">
+    <div class="card">
+      <div class="sec-title">Datos del colaborador</div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Nombre(s) *</label><input id="i-nombre" type="text" placeholder="Nombre(s)"></div>
+        <div class="field"><label>Apellido paterno *</label><input id="i-appaterno" type="text" placeholder="Apellido paterno"></div>
+        <div class="field"><label>Apellido materno</label><input id="i-apmaterno" type="text" placeholder="Apellido materno"></div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>CURP</label><input id="i-curp" type="text" placeholder="CURP" maxlength="18" style="text-transform:uppercase"></div>
+        <div class="field"><label>RFC</label><input id="i-rfc" type="text" placeholder="RFC" maxlength="13" style="text-transform:uppercase"></div>
+        <div class="field"><label>NSS (IMSS)</label><input id="i-nss" type="text" placeholder="Número de seguridad social" maxlength="11"></div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Fecha de ingreso *</label><input id="i-fecha" type="date"></div>
+        <div class="field"><label>Puesto</label><input id="i-puesto" type="text" placeholder="Puesto o cargo"></div>
+        <div class="field"><label>Departamento</label>
+          <select id="i-depto"><option value="">Seleccionar...</option><option>Administración</option><option>Operaciones</option><option>Ventas</option><option>Recursos humanos</option><option>Contabilidad</option><option>Sistemas</option><option>Logística</option><option>Producción</option><option>Dirección</option><option>Otro</option></select>
+        </div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Tipo de contrato</label>
+          <select id="i-contrato"><option value="">Seleccionar...</option><option>Indefinido</option><option>Temporal</option><option>Por proyecto</option><option>Honorarios</option><option>Período de prueba</option></select>
+        </div>
+        <div class="field"><label>Salario mensual (MXN)</label><input id="i-salario" type="number" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="field"><label>Correo institucional</label><input id="i-correo" type="email" placeholder="correo@empresa.com"></div>
+      </div>
+      <div class="grid2" style="margin-bottom:12px">
+        <div class="field"><label>Teléfono</label><input id="i-tel" type="tel" placeholder="55 1234 5678" maxlength="15"></div>
+        <div class="field"><label>Jefe directo</label><input id="i-jefe" type="text" placeholder="Nombre del supervisor"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec-title">Documentos recibidos</div>
+      <div class="doc-grid" id="docs-ingreso"></div>
+      <hr class="divider">
+      <div class="field"><label>Observaciones del ingreso</label><textarea id="i-obs" placeholder="Notas adicionales..."></textarea></div>
+      <div class="actions">
+        <button class="btn" onclick="clearIngreso()"><i class="ti ti-rotate" aria-hidden="true"></i> Limpiar</button>
+        <button class="btn btn-primary" onclick="saveIngreso()"><i class="ti ti-check" aria-hidden="true"></i> Registrar ingreso</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAJA -->
+  <div id="sec-baja" class="section">
+    <div class="card">
+      <div class="sec-title">Datos de la baja</div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Nombre del colaborador *</label><input id="b-nombre" type="text" placeholder="Nombre completo"></div>
+        <div class="field"><label>RFC</label><input id="b-rfc" type="text" placeholder="RFC" style="text-transform:uppercase" maxlength="13"></div>
+        <div class="field"><label>Departamento</label>
+          <select id="b-depto"><option value="">Seleccionar...</option><option>Administración</option><option>Operaciones</option><option>Ventas</option><option>Recursos humanos</option><option>Contabilidad</option><option>Sistemas</option><option>Logística</option><option>Producción</option><option>Dirección</option><option>Otro</option></select>
+        </div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Fecha de baja *</label><input id="b-fecha" type="date"></div>
+        <div class="field"><label>Motivo de baja</label>
+          <select id="b-motivo"><option value="">Seleccionar...</option><option>Renuncia voluntaria</option><option>Término de contrato</option><option>Despido justificado</option><option>Despido injustificado</option><option>Mutuo acuerdo</option><option>Jubilación</option><option>Fallecimiento</option><option>Abandono de empleo</option><option>Otro</option></select>
+        </div>
+        <div class="field"><label>Último día laborado</label><input id="b-ultimodia" type="date"></div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Días de liquidación</label><input id="b-dias" type="number" placeholder="0" min="0"></div>
+        <div class="field"><label>Importe de liquidación (MXN)</label><input id="b-importe" type="number" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="field"><label>Puesto</label><input id="b-puesto" type="text" placeholder="Puesto que ocupaba"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec-title">Entrega de documentos y activos</div>
+      <div class="doc-grid" id="docs-baja"></div>
+      <hr class="divider">
+      <div class="field"><label>Observaciones de la baja</label><textarea id="b-obs" placeholder="Notas sobre la baja..."></textarea></div>
+      <div class="actions">
+        <button class="btn" onclick="clearBaja()"><i class="ti ti-rotate" aria-hidden="true"></i> Limpiar</button>
+        <button class="btn btn-primary" onclick="saveBaja()"><i class="ti ti-check" aria-hidden="true"></i> Registrar baja</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEGUIMIENTO -->
+  <div id="sec-seguimiento" class="section">
+    <div class="card">
+      <div class="sec-title">Datos del seguimiento</div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Colaborador *</label><input id="s-nombre" type="text" placeholder="Nombre completo"></div>
+        <div class="field"><label>RFC</label><input id="s-rfc" type="text" placeholder="RFC" style="text-transform:uppercase" maxlength="13"></div>
+        <div class="field"><label>Departamento</label>
+          <select id="s-depto"><option value="">Seleccionar...</option><option>Administración</option><option>Operaciones</option><option>Ventas</option><option>Recursos humanos</option><option>Contabilidad</option><option>Sistemas</option><option>Logística</option><option>Producción</option><option>Dirección</option><option>Otro</option></select>
+        </div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Tipo de documento *</label>
+          <select id="s-tipo"><option value="">Seleccionar...</option><option>Contrato laboral</option><option>Acta de nacimiento</option><option>CURP</option><option>RFC</option><option>INE / IFE</option><option>Comprobante de domicilio</option><option>Comprobante de estudios</option><option>Carta de no antecedentes penales</option><option>IMSS alta</option><option>Nómina / recibo de pago</option><option>Evaluación de desempeño</option><option>Carta de recomendación</option><option>Constancia de trabajo</option><option>Expediente médico</option><option>Carta de renuncia</option><option>Finiquito / liquidación</option><option>Otro</option></select>
+        </div>
+        <div class="field"><label>Fecha de solicitud</label><input id="s-fechasol" type="date"></div>
+        <div class="field"><label>Fecha límite de entrega</label><input id="s-fechalim" type="date"></div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px">
+        <div class="field"><label>Estado</label>
+          <select id="s-estado"><option value="Pendiente">Pendiente</option><option value="En proceso">En proceso</option><option value="Completado">Completado</option><option value="Vencido">Vencido</option></select>
+        </div>
+        <div class="field"><label>Prioridad</label>
+          <select id="s-prioridad"><option>Normal</option><option>Alta</option><option>Urgente</option></select>
+        </div>
+        <div class="field"><label>Responsable</label><input id="s-responsable" type="text" placeholder="Nombre del responsable"></div>
+      </div>
+      <div class="field" style="margin-bottom:12px"><label>Notas del seguimiento</label><textarea id="s-notas" placeholder="Descripción o notas adicionales..."></textarea></div>
+      <div class="actions">
+        <button class="btn" onclick="clearSeguimiento()"><i class="ti ti-rotate" aria-hidden="true"></i> Limpiar</button>
+        <button class="btn btn-primary" onclick="saveSeguimiento()"><i class="ti ti-check" aria-hidden="true"></i> Registrar seguimiento</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div id="sec-historial" class="section">
+    <div class="search-bar">
+      <i class="ti ti-search" style="font-size:16px;color:var(--text-secondary)" aria-hidden="true"></i>
+      <input id="search-input" type="text" placeholder="Buscar por nombre, RFC, documento..." oninput="renderHistorial()">
+    </div>
+    <div class="filter-row">
+      <select id="filter-tipo" onchange="renderHistorial()">
+        <option value="">Todos los tipos</option>
+        <option value="ingreso">Ingreso</option>
+        <option value="baja">Baja</option>
+        <option value="seguimiento">Seguimiento</option>
+      </select>
+      <select id="filter-estado" onchange="renderHistorial()">
+        <option value="">Todos los estados</option>
+        <option>Pendiente</option><option>En proceso</option><option>Completado</option><option>Vencido</option>
+      </select>
+      <select id="filter-depto" onchange="renderHistorial()">
+        <option value="">Todos los departamentos</option>
+        <option>Administración</option><option>Operaciones</option><option>Ventas</option><option>Recursos humanos</option><option>Contabilidad</option><option>Sistemas</option><option>Logística</option><option>Producción</option><option>Dirección</option><option>Otro</option>
+      </select>
+      <button class="btn" onclick="exportCSV()"><i class="ti ti-download" aria-hidden="true"></i> Exportar CSV</button>
+      <button class="btn btn-danger" onclick="confirmClearAll()" style="margin-left:auto"><i class="ti ti-trash" aria-hidden="true"></i> Borrar todo</button>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div id="historial-table" class="table-wrap"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="detail-modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Detalle del registro</h3>
+      <button class="icon-btn" onclick="closeModalDirect()"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+const STORAGE_KEY = 'th_records_v2';
+let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+const today = new Date().toISOString().slice(0,10);
+
+const DOCS_INGRESO = ['Acta de nacimiento','CURP','RFC','INE / IFE','Comprobante de domicilio','Comprobante de estudios','Carta de no antecedentes penales','IMSS alta','Contrato laboral firmado','Examen médico de ingreso','Fotografías','Cuenta bancaria (CLABE)'];
+const DOCS_BAJA = ['Carta de renuncia','Finiquito firmado','Contrato devuelto','Credencial de empresa','Equipo de cómputo','Uniformes / EPP','Llaves / tarjetas de acceso','Baja IMSS','Carta de no adeudo'];
+
+function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+
+function renderDocChecks(cid, docs) {
+  document.getElementById(cid).innerHTML = docs.map((d,i) =>
+    `<label class="doc-check"><input type="checkbox" id="${cid}-${i}"> ${d}</label>`).join('');
+}
+renderDocChecks('docs-ingreso', DOCS_INGRESO);
+renderDocChecks('docs-baja', DOCS_BAJA);
+document.getElementById('i-fecha').value = today;
+document.getElementById('b-fecha').value = today;
+document.getElementById('s-fechasol').value = today;
+updateDashboard();
+
+function toast(msg, dur=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), dur);
+}
+
+function showTab(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  if (name === 'historial') renderHistorial();
+  if (name === 'dashboard') updateDashboard();
+}
+
+function getChecked(cid, docs) { return docs.filter((_,i) => document.getElementById(`${cid}-${i}`)?.checked); }
+function clearChecks(cid, docs) { docs.forEach((_,i) => { const e = document.getElementById(`${cid}-${i}`); if(e) e.checked=false; }); }
+function val(id) { return (document.getElementById(id)?.value||'').trim(); }
+function setVal(id,v) { const e=document.getElementById(id); if(e) e.value=v; }
+
+function badgeTipo(t) {
+  const m={ingreso:['badge-ingreso','ti-user-plus','Ingreso'],baja:['badge-baja','ti-user-minus','Baja'],seguimiento:['badge-seguimiento','ti-file-search','Seguimiento']};
+  const [c,i,l]=m[t]||['','',''];
+  return `<span class="badge ${c}"><i class="ti ${i}" style="font-size:11px" aria-hidden="true"></i>${l}</span>`;
+}
+function badgeEstado(e) {
+  const m={'Pendiente':'badge-pendiente','Completado':'badge-completado','En proceso':'badge-enproceso','Vencido':'badge-vencido'};
+  return `<span class="badge ${m[e]||'badge-pendiente'}">${e||'—'}</span>`;
+}
+function fmtMoney(v) {
+  if(!v) return '—';
+  return new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(Number(v));
+}
+
+function saveIngreso() {
+  const nombre=[val('i-nombre'),val('i-appaterno'),val('i-apmaterno')].filter(Boolean).join(' ');
+  if(!val('i-nombre')||!val('i-appaterno')){toast('Nombre y apellido paterno son requeridos');return;}
+  if(!val('i-fecha')){toast('La fecha de ingreso es requerida');return;}
+  records.push({id:Date.now(),tipo:'ingreso',fecha:val('i-fecha'),nombre,curp:val('i-curp').toUpperCase(),rfc:val('i-rfc').toUpperCase(),nss:val('i-nss'),puesto:val('i-puesto'),departamento:val('i-depto'),contrato:val('i-contrato'),salario:val('i-salario'),correo:val('i-correo'),telefono:val('i-tel'),jefe:val('i-jefe'),documentos:getChecked('docs-ingreso',DOCS_INGRESO),observaciones:val('i-obs'),estado:'Completado'});
+  saveData(); clearIngreso(); updateDashboard(); toast('✓ Ingreso registrado correctamente');
+}
+function clearIngreso() {
+  ['i-nombre','i-appaterno','i-apmaterno','i-curp','i-rfc','i-nss','i-puesto','i-obs','i-salario','i-correo','i-tel','i-jefe'].forEach(id=>setVal(id,''));
+  setVal('i-depto',''); setVal('i-contrato',''); setVal('i-fecha',today);
+  clearChecks('docs-ingreso',DOCS_INGRESO);
+}
+
+function saveBaja() {
+  if(!val('b-nombre')){toast('El nombre del colaborador es requerido');return;}
+  if(!val('b-fecha')){toast('La fecha de baja es requerida');return;}
+  records.push({id:Date.now(),tipo:'baja',fecha:val('b-fecha'),nombre:val('b-nombre'),rfc:val('b-rfc').toUpperCase(),departamento:val('b-depto'),puesto:val('b-puesto'),motivo:val('b-motivo'),ultimoDia:val('b-ultimodia'),diasLiq:val('b-dias'),importeLiq:val('b-importe'),documentos:getChecked('docs-baja',DOCS_BAJA),observaciones:val('b-obs'),estado:'Completado'});
+  saveData(); clearBaja(); updateDashboard(); toast('✓ Baja registrada correctamente');
+}
+function clearBaja() {
+  ['b-nombre','b-rfc','b-obs','b-dias','b-importe','b-puesto','b-ultimodia'].forEach(id=>setVal(id,''));
+  setVal('b-depto',''); setVal('b-motivo',''); setVal('b-fecha',today);
+  clearChecks('docs-baja',DOCS_BAJA);
+}
+
+function saveSeguimiento() {
+  if(!val('s-nombre')){toast('El nombre del colaborador es requerido');return;}
+  if(!val('s-tipo')){toast('El tipo de documento es requerido');return;}
+  records.push({id:Date.now(),tipo:'seguimiento',fecha:val('s-fechasol')||today,nombre:val('s-nombre'),rfc:val('s-rfc').toUpperCase(),departamento:val('s-depto'),documento:val('s-tipo'),fechaLimite:val('s-fechalim'),estado:val('s-estado')||'Pendiente',prioridad:val('s-prioridad')||'Normal',responsable:val('s-responsable'),notas:val('s-notas')});
+  saveData(); clearSeguimiento(); updateDashboard(); toast('✓ Seguimiento registrado correctamente');
+}
+function clearSeguimiento() {
+  ['s-nombre','s-rfc','s-responsable','s-notas','s-fechalim'].forEach(id=>setVal(id,''));
+  setVal('s-tipo',''); setVal('s-depto',''); setVal('s-estado','Pendiente'); setVal('s-prioridad','Normal'); setVal('s-fechasol',today);
+}
+
+function deleteRecord(id) {
+  if(!confirm('¿Eliminar este registro?')) return;
+  records=records.filter(r=>r.id!==id); saveData(); updateDashboard(); renderHistorial(); toast('Registro eliminado');
+}
+function confirmClearAll() {
+  if(!records.length){toast('No hay registros para eliminar');return;}
+  if(!confirm('¿Eliminar TODOS los registros? Esta acción no se puede deshacer.')) return;
+  records=[]; saveData(); updateDashboard(); renderHistorial(); toast('Todos los registros han sido eliminados');
+}
+
+function updateDashboard() {
+  const ing=records.filter(r=>r.tipo==='ingreso').length;
+  const baj=records.filter(r=>r.tipo==='baja').length;
+  const seg=records.filter(r=>r.tipo==='seguimiento').length;
+  const pen=records.filter(r=>r.tipo==='seguimiento'&&r.estado==='Pendiente').length;
+  document.getElementById('metrics-box').innerHTML=`
+    <div class="metric"><div class="metric-icon"><i class="ti ti-user-plus" style="color:#1D9E75" aria-hidden="true"></i></div><div class="metric-val" style="color:#1D9E75">${ing}</div><div class="metric-lbl">Ingresos registrados</div></div>
+    <div class="metric"><div class="metric-icon"><i class="ti ti-user-minus" style="color:#D85A30" aria-hidden="true"></i></div><div class="metric-val" style="color:#D85A30">${baj}</div><div class="metric-lbl">Bajas registradas</div></div>
+    <div class="metric"><div class="metric-icon"><i class="ti ti-file-search" style="color:#378ADD" aria-hidden="true"></i></div><div class="metric-val" style="color:#378ADD">${seg}</div><div class="metric-lbl">Seguimientos activos</div></div>
+    <div class="metric"><div class="metric-icon"><i class="ti ti-clock-exclamation" style="color:#BA7517" aria-hidden="true"></i></div><div class="metric-val" style="color:#BA7517">${pen}</div><div class="metric-lbl">Documentos pendientes</div></div>`;
+  const recent=[...records].reverse().slice(0,10);
+  const box=document.getElementById('recent-table');
+  if(!recent.length){box.innerHTML='<div class="empty"><i class="ti ti-inbox" aria-hidden="true"></i>Sin movimientos registrados aún.</div>';return;}
+  box.innerHTML=`<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Colaborador</th><th>Detalle</th><th>Estado</th></tr></thead><tbody>${recent.map(r=>`<tr><td style="font-size:12px;color:var(--text-secondary)">${r.fecha}</td><td>${badgeTipo(r.tipo)}</td><td style="font-weight:500">${r.nombre}</td><td style="color:var(--text-secondary);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.tipo==='ingreso'?(r.puesto||'')+(r.departamento?' · '+r.departamento:''):r.tipo==='baja'?(r.motivo||'')+(r.departamento?' · '+r.departamento:''):(r.documento||'')+(r.departamento?' · '+r.departamento:'')}</td><td>${badgeEstado(r.estado)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function renderHistorial() {
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  const ft=document.getElementById('filter-tipo')?.value||'';
+  const fe=document.getElementById('filter-estado')?.value||'';
+  const fd=document.getElementById('filter-depto')?.value||'';
+  const data=[...records].reverse().filter(r=>{
+    const h=(r.nombre+(r.rfc||'')+(r.documento||'')+(r.puesto||'')+(r.motivo||'')).toLowerCase();
+    return(!q||h.includes(q))&&(!ft||r.tipo===ft)&&(!fe||r.estado===fe)&&(!fd||r.departamento===fd);
+  });
+  const box=document.getElementById('historial-table');
+  if(!data.length){box.innerHTML='<div class="empty"><i class="ti ti-search-off" aria-hidden="true"></i>Sin resultados para los filtros aplicados.</div>';return;}
+  box.innerHTML=`<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Colaborador</th><th>RFC</th><th>Departamento</th><th>Detalle</th><th>Estado</th><th></th></tr></thead><tbody>${data.map(r=>`<tr><td style="font-size:12px;white-space:nowrap;color:var(--text-secondary)">${r.fecha}</td><td>${badgeTipo(r.tipo)}</td><td style="font-weight:500;white-space:nowrap">${r.nombre}</td><td style="font-family:monospace;font-size:12px">${r.rfc||'—'}</td><td style="font-size:12px;color:var(--text-secondary)">${r.departamento||'—'}</td><td style="color:var(--text-secondary);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.tipo==='ingreso'?r.puesto||'—':r.tipo==='baja'?r.motivo||'—':r.documento||'—'}</td><td>${badgeEstado(r.estado)}</td><td><div class="row-actions"><button class="icon-btn" onclick="showDetail(${r.id})" title="Ver detalle"><i class="ti ti-eye" style="font-size:15px" aria-hidden="true"></i></button><button class="icon-btn btn-danger" onclick="deleteRecord(${r.id})" title="Eliminar"><i class="ti ti-trash" style="font-size:15px" aria-hidden="true"></i></button></div></td></tr>`).join('')}</tbody></table>`;
+}
+
+function showDetail(id) {
+  const r=records.find(rec=>rec.id===id); if(!r) return;
+  const row=(l,v)=>v?`<div class="modal-row"><span class="lbl">${l}</span><span class="val">${v}</span></div>`:'';
+  let body='';
+  if(r.tipo==='ingreso') body=row('Nombre',r.nombre)+row('CURP',r.curp)+row('RFC',r.rfc)+row('NSS',r.nss)+row('Puesto',r.puesto)+row('Departamento',r.departamento)+row('Tipo de contrato',r.contrato)+row('Salario mensual',fmtMoney(r.salario))+row('Correo',r.correo)+row('Teléfono',r.telefono)+row('Jefe directo',r.jefe)+row('Fecha de ingreso',r.fecha)+(r.documentos?.length?row('Documentos recibidos',r.documentos.join(', ')):'') +row('Observaciones',r.observaciones);
+  else if(r.tipo==='baja') body=row('Nombre',r.nombre)+row('RFC',r.rfc)+row('Puesto',r.puesto)+row('Departamento',r.departamento)+row('Fecha de baja',r.fecha)+row('Motivo',r.motivo)+row('Último día',r.ultimoDia)+row('Días liquidación',r.diasLiq)+row('Importe liquidación',fmtMoney(r.importeLiq))+(r.documentos?.length?row('Documentos entregados',r.documentos.join(', ')):'') +row('Observaciones',r.observaciones);
+  else body=row('Colaborador',r.nombre)+row('RFC',r.rfc)+row('Departamento',r.departamento)+row('Documento',r.documento)+row('Fecha solicitud',r.fecha)+row('Fecha límite',r.fechaLimite)+row('Estado',r.estado)+row('Prioridad',r.prioridad)+row('Responsable',r.responsable)+row('Notas',r.notas);
+  document.getElementById('modal-title').textContent={ingreso:'Detalle — Ingreso',baja:'Detalle — Baja',seguimiento:'Detalle — Seguimiento'}[r.tipo];
+  document.getElementById('modal-body').innerHTML=body;
+  document.getElementById('detail-modal').classList.add('open');
+}
+function closeModal(e){if(e.target===document.getElementById('detail-modal'))closeModalDirect();}
+function closeModalDirect(){document.getElementById('detail-modal').classList.remove('open');}
+
+function exportCSV() {
+  if(!records.length){toast('No hay registros para exportar');return;}
+  const headers=['ID','Tipo','Fecha','Nombre','RFC','CURP','NSS','Puesto','Departamento','Contrato','Motivo','Estado','Documento','Responsable','Prioridad','Salario','Dias Liq.','Importe Liq.','Observaciones'];
+  const rows=records.map(r=>[r.id,r.tipo,r.fecha,r.nombre,r.rfc||'',r.curp||'',r.nss||'',r.puesto||'',r.departamento||'',r.contrato||'',r.motivo||'',r.estado||'',r.documento||'',r.responsable||'',r.prioridad||'',r.salario||'',r.diasLiq||'',r.importeLiq||'',(r.observaciones||r.notas||'').replace(/\n/g,' ')].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
+  const csv='﻿'+[headers.join(','),...rows].join('\r\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='talento_humano_'+today+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  toast('✓ CSV exportado');
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect();});
+</script>
+</body>
+</html>
