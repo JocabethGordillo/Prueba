@@ -444,6 +444,7 @@ function showTab(name, el) {
   if (el) el.classList.add('active');
   if (name === 'historial') renderHistorial();
   if (name === 'dashboard') updateDashboard();
+  if (name === 'reporte') { initRepAnio(); renderReporte(); }
 }
 
 function getChecked(cid, docs) { return docs.filter((_,i) => document.getElementById(`${cid}-${i}`)?.checked); }
@@ -770,13 +771,6 @@ function exportReporteCSV() {
 
 // Inicializar año al cargar
 initRepAnio();
-
-// Actualizar año en showTab reporte
-const _origShowTab = showTab;
-function showTab(name, el) {
-  _origShowTab(name, el);
-  if (name === 'reporte') { initRepAnio(); renderReporte(); }
-}
 </script>
 </body>
 </html>
